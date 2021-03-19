@@ -4,6 +4,7 @@
 import pygame
 import sys
 import os
+import pickle
 
 #############################
 # the room where it happens #
@@ -24,11 +25,11 @@ def main():
     pygame.time.Clock().tick(30)
     
     #############
-    # load time #d
+    # load time #
     #############
     icon = pygame.image.load(os.path.join("assets", "images", "icon.png"))
     bg = pygame.image.load(os.path.join("assets", "images", "bg.png"))
-    font = pygame.font.SysFont(os.path.join("assets", "fonts", "joystix monospace.ttf"), 12)
+    joystix = pygame.font.Font(os.path.join("assets", "fonts", "joystix.ttf"), 30)
     
     ##############################
     # game logo and window title #
@@ -41,13 +42,39 @@ def main():
     # and the game existed                             #
     ####################################################
     screen = pygame.display.set_mode((800,600))
-
     
     ###################################################################
     # graphic design is my passion                                    #
     # pretend that's in like comic sans or something with a shitty bg #
     ###################################################################
+    screen.blit(bg, (0, 0))
+    textBox = pygame.draw.rect(screen, (30,30,30), (0, 400, 800, 50))
     
+    ###############################
+    # initializing some variables #
+    ###############################
+    global location
+    global hp
+    global level
+    global lhl
+    location = 1
+    hp = 20
+    level = 1
+    lhl = [location, hp, level]
+    
+    #####################
+    # loading save data #
+    #####################
+    try:
+        with open(os.path.join("data", "save.txt"), "rb") as save:
+            lhl = pickle.load(save)
+            location = lhl[0]
+            hp = lhl[1]
+            level = lhl[2]
+    except(ValueError, SyntaxError, MemoryError, pickle.UnpicklingError):
+        screen.blit(joystix.render(">Save data was corrupted.", True, (255,255,255)), (0,400))
+        
+
     #########################
     # is your code running? #
     #########################
@@ -58,7 +85,6 @@ def main():
     
     while running:
         
-        screen.blit(bg, (0, 0))   
         
         for event in pygame.event.get():
             
@@ -72,6 +98,9 @@ def main():
             # i really dont understand any of this wizardry        #
             ########################################################
             if(event.type == pygame.QUIT):
+                lhl = [location, hp, level]
+                with open(os.path.join("data", "save.txt"), "wb") as save:
+                    pickle.dump(lhl, save)
                 running = False
                 pygame.quit()
                 sys.exit()
