@@ -29,7 +29,7 @@ def main():
     #############
     icon = pygame.image.load(os.path.join("assets", "images", "icon.png"))
     bg = pygame.image.load(os.path.join("assets", "images", "bg.png"))
-    joystix = pygame.font.Font(os.path.join("assets", "fonts", "joystix.ttf"), 30)
+    joystix = pygame.font.Font(os.path.join("assets", "fonts", "joystix.ttf"), 15)
     
     ##############################
     # game logo and window title #
@@ -47,33 +47,42 @@ def main():
     # graphic design is my passion                                    #
     # pretend that's in like comic sans or something with a shitty bg #
     ###################################################################
-    screen.blit(bg, (0, 0))
-    textBox = pygame.draw.rect(screen, (30,30,30), (0, 400, 800, 50))
+    def redrawBg():
+        screen.blit(bg, (0, 0))
+    redrawBg()
+    def redrawTextBox():
+        pygame.draw.rect(screen, (30,30,30), (0, 400, 800, 50))
+    redrawTextBox()
+    def redrawSpriteBox():
+        pygame.draw.rect(screen, (0,0,0), (300, 200, 200, 200))
+    redrawSpriteBox()
     
     ###############################
     # initializing some variables #
     ###############################
     global location
     global hp
+    global maxHp
     global level
-    global lhl
-    location = 1
+    global lhml
+    location = 0
     hp = 20
+    maxHp = 20
     level = 1
-    lhl = [location, hp, level]
+    lhml = [location, hp, maxHp, level]
     
     #####################
     # loading save data #
     #####################
     try:
         with open(os.path.join("data", "save.txt"), "rb") as save:
-            lhl = pickle.load(save)
-            location = lhl[0]
-            hp = lhl[1]
-            level = lhl[2]
+            lhml = pickle.load(save)
+            location = lhml[0]
+            hp = lhml[1]
+            maxHp = lhml[2]
+            level = lhml[3]
     except(ValueError, SyntaxError, MemoryError, pickle.UnpicklingError):
-        screen.blit(joystix.render(">Save data was corrupted.", True, (255,255,255)), (0,400))
-        
+        screen.blit(joystix.render(">Save data was corrupted. Please restart.", True, (255,255,255)), (0,400))
 
     #########################
     # is your code running? #
@@ -85,22 +94,16 @@ def main():
     
     while running:
         
-        
         for event in pygame.event.get():
-            
-            ##################################
-            # welcome to event handler hell. #
-            ##################################
-            
             ########################################################
             # thank god this makes me not have to use task manager #
             # dont fucking edit this or i will die.                #
             # i really dont understand any of this wizardry        #
             ########################################################
             if(event.type == pygame.QUIT):
-                lhl = [location, hp, level]
+                lhml = [location, hp, maxHp, level]
                 with open(os.path.join("data", "save.txt"), "wb") as save:
-                    pickle.dump(lhl, save)
+                    pickle.dump(lhml, save)
                 running = False
                 pygame.quit()
                 sys.exit()
@@ -114,4 +117,5 @@ def main():
 ###############################################
 # this makes the thing do the existing thing. #
 ###############################################
+
 main()
